@@ -1,7 +1,5 @@
 package com.taptrans.taptotransfer;
 
-import com.taptrans.filebrowser.FileBrowser;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +8,9 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.taptrans.contactserver.RegisterUser;
+import com.taptrans.filebrowser.FileBrowser;
 
 public class BeginTapTrans extends Activity {
 
@@ -45,7 +46,9 @@ public class BeginTapTrans extends Activity {
 	}
 
 	public void transferFile(View view) {
-
+			//Log.i("Device ip address is: ", Util.getDeviceIpAddress());
+			RegisterUser user = new RegisterUser("9008416496", "10.10.10.10");
+			user.registerNow();
 	}
 
 	// Listen for results.
