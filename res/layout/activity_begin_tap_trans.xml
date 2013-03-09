@@ -43,8 +43,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/editText"
             android:layout_marginTop="10dp"
-            android:onClick="transferFile"
-            android:text="@string/transfer_file"
+            android:onClick="registerAccount"
+            android:text="@string/register_account"
             android:textSize="18sp" >
         </Button>
     </RelativeLayout>

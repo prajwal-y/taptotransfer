@@ -1,16 +1,26 @@
 package com.taptrans.taptotransfer;
 
+import java.util.HashMap;
+
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
+import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.taptrans.contactserver.RegisterUser;
+import com.google.android.gcm.GCMRegistrar;
 import com.taptrans.filebrowser.FileBrowser;
+import com.taptrans.util.AppConstants;
+import com.taptrans.util.AppData;
+import com.taptrans.xmpp.XMPPOperations;
+import com.taptrans.xmpp.XMPPUtil;
 
 public class BeginTapTrans extends Activity {
 
@@ -23,13 +33,33 @@ public class BeginTapTrans extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_begin_tap_trans);
 		edittext = (EditText) findViewById(R.id.editText);
+		TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+		AppData.IMEI = tm.getDeviceId();
+		//checkGCMRegistration();
+		AppData.activity = this;
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.activity_begin_tap_trans, menu);
 		return true;
+	}
+
+	public void checkGCMRegistration() {
+		//Firstly, checking whether the registration ID is stored
+		SharedPreferences sharedPref = BeginTapTrans.this.getPreferences(Context.MODE_PRIVATE);
+		AppData.gcmRegId = sharedPref.getString(AppConstants.GCM_REG_ID, "");
+		Log.i("INFO: ", "GCM Registration ID received from stored preferences: "+AppData.gcmRegId);
+		if (AppData.gcmRegId.equals("")) {
+			GCMRegistrar.checkDevice(this);
+			GCMRegistrar.checkManifest(this);
+			String regId = GCMRegistrar.getRegistrationId(this);
+			if (regId.equals("")) {
+				GCMRegistrar.register(this, AppConstants.SENDER_ID);
+			} else {
+				Log.v("INFO:", "Already registered");
+			}
+		}
 	}
 
 	public void getFile(View view) {
@@ -45,10 +75,12 @@ public class BeginTapTrans extends Activity {
 		}
 	}
 
-	public void transferFile(View view) {
-			//Log.i("Device ip address is: ", Util.getDeviceIpAddress());
-			RegisterUser user = new RegisterUser("9008416496", "10.10.10.10");
-			user.registerNow();
+	public void registerAccount(View view) {
+		XMPPOperations user = new XMPPOperations();
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put(AppConstants.USERNAME, "9008416496"); //change this
+		map.put(AppConstants.PASSWORD, AppData.IMEI);
+		user.registerUserAccount(map);
 	}
 
 	// Listen for results.

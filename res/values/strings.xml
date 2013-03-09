@@ -7,5 +7,6 @@
     <string name="file_browser">File Browser</string>
     <string name="browse_files">Browse Files</string>
     <string name="transfer_file">Transfer File</string>
+    <string name="register_account">Register</string>
 
 </resources>
