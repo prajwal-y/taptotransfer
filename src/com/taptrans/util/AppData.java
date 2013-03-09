@@ -7,4 +7,5 @@ public class AppData {
 	public static String gcmRegId = null;
 	public static Activity activity = null;
 	public static String IMEI = null;
+	public static String username = null;
 }

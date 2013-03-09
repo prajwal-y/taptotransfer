@@ -20,7 +20,7 @@ import com.taptrans.filebrowser.FileBrowser;
 import com.taptrans.util.AppConstants;
 import com.taptrans.util.AppData;
 import com.taptrans.xmpp.XMPPOperations;
-import com.taptrans.xmpp.XMPPUtil;
+import com.taptrans.xmpp.XMPPService;
 
 public class BeginTapTrans extends Activity {
 
@@ -35,7 +35,7 @@ public class BeginTapTrans extends Activity {
 		edittext = (EditText) findViewById(R.id.editText);
 		TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
 		AppData.IMEI = tm.getDeviceId();
-		//checkGCMRegistration();
+		AppData.username = "9008416496";
 		AppData.activity = this;
 	}
 
@@ -76,16 +76,35 @@ public class BeginTapTrans extends Activity {
 	}
 
 	public void registerAccount(View view) {
+		Toast.makeText(this, "Registering account..", Toast.LENGTH_SHORT).show();
+		stopService(new Intent(this, XMPPService.class));
 		XMPPOperations user = new XMPPOperations();
 		HashMap<String, String> map = new HashMap<String, String>();
-		map.put(AppConstants.USERNAME, "9008416496"); //change this
+		map.put(AppConstants.USERNAME, AppData.username);
 		map.put(AppConstants.PASSWORD, AppData.IMEI);
 		user.registerUserAccount(map);
 	}
 
-	// Listen for results.
+	public void deleteAccount(View view) {
+		Toast.makeText(this, "Deleting account..", Toast.LENGTH_SHORT).show();
+		new XMPPOperations().unregisterUser();
+	}
+	
+	public void logInAccount(View view) {
+		Toast.makeText(this, "Logging in..", Toast.LENGTH_SHORT).show();
+		startService(new Intent(this, XMPPService.class));
+	}
+	
+	public void logOutAccount(View view) {
+		Toast.makeText(this, "Logging out..", Toast.LENGTH_SHORT).show();
+		stopService(new Intent(this, XMPPService.class));
+	}
+	
+	public void transferFile(View view) {
+		
+	}
+	
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// See which child activity is calling us back.
 		if (requestCode == REQUEST_PATH) {
 			if (resultCode == RESULT_OK) {
 				curFileName = data.getStringExtra("GetFileName");

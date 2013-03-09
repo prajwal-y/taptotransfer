@@ -8,5 +8,8 @@
     <string name="browse_files">Browse Files</string>
     <string name="transfer_file">Transfer File</string>
     <string name="register_account">Register</string>
+    <string name="login_user">Log In</string>
+    <string name="logout_user">Log Out</string>
+    <string name="delete_account">Delete Account</string>
 
 </resources>

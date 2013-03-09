@@ -8,10 +8,16 @@ import com.taptrans.util.AppConstants;
 
 public class XMPPUtil {
 
-	private static String TAG = "XMPPUtil";
-	public static Connection createConnection() {
-		ConnectionConfiguration config = new ConnectionConfiguration(AppConstants.XMPP_DOMAIN, AppConstants.XMPP_PORT);
-		Connection conn = new XMPPConnection(config);
+	public static Connection conn = null;
+
+	public static Connection getConnection() {
+		if (conn == null) {
+			ConnectionConfiguration config = new ConnectionConfiguration(
+					AppConstants.XMPP_DOMAIN, AppConstants.XMPP_PORT);
+			config.setCompressionEnabled(false);
+			config.setSASLAuthenticationEnabled(true);
+			conn = new XMPPConnection(config);
+		}
 		return conn;
 	}
 }

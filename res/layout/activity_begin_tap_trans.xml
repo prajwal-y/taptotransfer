@@ -2,8 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    tools:context=".BeginTapTrans" 
-    android:background="@android:color/black">
+    android:background="@android:color/black"
+    tools:context=".BeginTapTrans" >
 
     <RelativeLayout
         android:id="@+id/relativeLayout1"
@@ -12,7 +12,6 @@
 
         <EditText
             android:id="@+id/editText"
-            android:textColor="@android:color/white"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -22,29 +21,79 @@
             android:layout_toLeftOf="@+id/skipButton"
             android:ems="10"
             android:hint="EditText"
-            android:inputType="textPersonName" >
+            android:inputType="textPersonName"
+            android:textColor="@android:color/white" >
         </EditText>
 
         <Button
             android:id="@+id/skipButton"
-            android:textColor="@android:color/white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_marginTop="10dp"
             android:onClick="getFile"
             android:text="@string/browse_files"
+            android:textColor="@android:color/white"
             android:textSize="18sp" >
         </Button>
-        
+
         <Button
-            android:id="@+id/transferButton"
+            android:id="@+id/registerButton"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/editText"
             android:layout_marginTop="10dp"
             android:onClick="registerAccount"
             android:text="@string/register_account"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" >
+        </Button>
+
+        <Button
+            android:id="@+id/logInButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/registerButton"
+            android:layout_marginTop="10dp"
+            android:onClick="logInAccount"
+            android:text="@string/login_user"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" >
+        </Button>
+
+        <Button
+            android:id="@+id/logOutButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/logInButton"
+            android:layout_marginTop="10dp"
+            android:onClick="logOutAccount"
+            android:text="@string/logout_user"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" >
+        </Button>
+
+        <Button
+            android:id="@+id/unregisterButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/logOutButton"
+            android:layout_marginTop="10dp"
+            android:onClick="deleteAccount"
+            android:text="@string/delete_account"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" >
+        </Button>
+
+        <Button
+            android:id="@+id/transferButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/unregisterButton"
+            android:layout_marginTop="10dp"
+            android:onClick="transferData"
+            android:text="@string/transfer_file"
+            android:textColor="@android:color/white"
             android:textSize="18sp" >
         </Button>
     </RelativeLayout>
