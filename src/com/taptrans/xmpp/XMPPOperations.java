@@ -3,7 +3,11 @@ package com.taptrans.xmpp;
 import java.util.HashMap;
 
 import org.jivesoftware.smack.AccountManager;
+import org.jivesoftware.smack.Chat;
+import org.jivesoftware.smack.ChatManager;
+import org.jivesoftware.smack.ChatManagerListener;
 import org.jivesoftware.smack.Connection;
+import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Registration;
@@ -33,7 +37,10 @@ public class XMPPOperations {
 	public void unregisterUser() {
 		new UnRegisterUser().execute();
 	}
-
+	
+	public void sendMessage() {
+		new Message().execute();
+	}
 	private class RegisterUser extends
 			AsyncTask<HashMap<String, String>, Void, Void> {
 		//Background operation for creating device account.
@@ -90,4 +97,51 @@ public class XMPPOperations {
 		}
 
 	}
-}
+	
+	public class Message extends AsyncTask<Void, Void, Void>{
+		//Send message to device
+		@Override
+		protected Void doInBackground(Void... arg0) {
+			Connection conn = XMPPUtil.getConnection();
+			try {
+				if(!conn.isConnected())
+					conn.connect();
+				if(!conn.isAuthenticated())
+					conn.login(AppData.username, AppData.IMEI);
+				ChatManager chatmanager = conn.getChatManager();
+				Chat newChat = chatmanager.createChat("9008416496@107.20.254.21", new MessageListener() {
+				    
+					@Override
+					public void processMessage(Chat arg0,
+							org.jivesoftware.smack.packet.Message arg1) {
+						Log.i(TAG, "Message received!");
+						ShowNotifications.notifyUser("Message",
+								"Message received:" + arg1, new Intent());
+						
+					}
+				});
+
+				try {
+				    newChat.sendMessage("Howdy!");
+				}
+				catch (XMPPException e) {
+					Log.e(TAG, "XMPPException: ", e);
+					ShowNotifications.notifyUser("Message",
+							"Message sending failed. Try Again.", new Intent());
+				}
+			} catch (XMPPException e) {
+				Log.e(TAG, "XMPPException: ", e);
+				ShowNotifications.notifyUser("Message",
+						"Message sending failed. Try Again.", new Intent());
+				return null;
+			}
+			Log.i(TAG, "Message Succesfully sent!");
+			ShowNotifications.notifyUser("Message",
+					"Message successfully sent", new Intent());
+			return null;
+		
+	}
+	}
+	
+	}
+
