@@ -15,4 +15,6 @@ public class AppConstants {
 	public static final int XMPP_PORT = 5222;
 	public static final String USERNAME = "username";
 	public static final String PASSWORD = "password";
+	public static final String FILENAME = "FILENAME";
+	public static final String RECEIPIENT = "RECEIPIENT";
 }

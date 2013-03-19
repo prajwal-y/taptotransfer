@@ -1,5 +1,7 @@
 package com.taptrans.xmpp;
 
+import java.io.File;
+
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManagerListener;
 import org.jivesoftware.smack.Connection;
@@ -7,10 +9,15 @@ import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.SASLAuthentication;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smackx.filetransfer.FileTransferListener;
+import org.jivesoftware.smackx.filetransfer.FileTransferManager;
+import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
+import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -21,6 +28,7 @@ public class XMPPService extends Service {
 
 	private static Connection m_XMPPConnection = null;
 	private static String TAG = "XMPPService";
+	private static FileTransferManager manager = null;
 
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -31,6 +39,7 @@ public class XMPPService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		m_XMPPConnection = XMPPUtil.getConnection();
+		manager = new FileTransferManager(m_XMPPConnection);
 		new backgroundOperation().execute();
 	}
 
@@ -88,6 +97,67 @@ public class XMPPService extends Service {
 							}
 						}
 					});
+
+			manager.addFileTransferListener(new FileTransferListener() {
+				public void fileTransferRequest(
+						final FileTransferRequest request) {
+					new Thread() {
+						@Override
+						public void run() {
+							IncomingFileTransfer transfer = request.accept();
+							File mf = Environment.getExternalStorageDirectory();
+							File file = new File(mf.getAbsoluteFile()
+									+ transfer.getFileName());
+							Intent notifyIntent = new Intent();
+							try {
+								transfer.recieveFile(file);
+								while (!transfer.isDone()) {
+									try {
+										Thread.sleep(1000L);
+										Log.i(TAG, "Recieving file");
+										// ShowNotifications.notifyUser("XMPP File transfer",
+										// "File transfer status: RECIEVING",
+										// notifyIntent);
+									} catch (Exception e) {
+										Log.e(TAG, e.getMessage(), e);
+										ShowNotifications.notifyUser(
+												"XMPP File transfer",
+												"File transfer status: FAILED",
+												notifyIntent);
+									}
+									if (transfer
+											.getStatus()
+											.equals(org.jivesoftware.smackx.filetransfer.FileTransfer.Status.error)) {
+										Log.e(TAG, transfer.getError()
+												.getMessage());
+										ShowNotifications.notifyUser(
+												"File transfer",
+												"File transfer status: FAILED",
+												notifyIntent);
+									}
+									if (transfer.getException() != null) {
+										Log.e(TAG,
+												"Exception during receiving file: ",
+												transfer.getException());
+										ShowNotifications.notifyUser(
+												"File transfer",
+												"File transfer status: FAILED",
+												notifyIntent);
+									}
+								}
+							} catch (Exception e) {
+								Log.e(TAG, e.getMessage(), e);
+								ShowNotifications.notifyUser("File transfer",
+										"File transfer status: FAILED",
+										notifyIntent);
+							}
+							ShowNotifications.notifyUser("File transfer",
+									"File transfer status: SUCCESSFUL!",
+									notifyIntent);
+						};
+					}.start();
+				}
+			});
 			return null;
 		}
 

@@ -8,4 +8,5 @@ public class AppData {
 	public static Activity activity = null;
 	public static String IMEI = null;
 	public static String username = null;
+	public static String file = null;
 }

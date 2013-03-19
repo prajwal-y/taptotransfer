@@ -35,7 +35,7 @@ public class BeginTapTrans extends Activity {
 		edittext = (EditText) findViewById(R.id.editText);
 		TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
 		AppData.IMEI = tm.getDeviceId();
-		AppData.username = "9481603262";
+		AppData.username = "9008416496";
 		AppData.activity = this;
 		
 	}
@@ -101,7 +101,7 @@ public class BeginTapTrans extends Activity {
 		stopService(new Intent(this, XMPPService.class));
 	}
 	
-	public void transferFile(View view) {
+	public void transferData(View view) {
 		new XMPPOperations().sendMessage();
 	}
 	
