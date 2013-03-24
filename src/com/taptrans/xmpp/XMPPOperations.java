@@ -9,7 +9,6 @@ import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Registration;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
@@ -30,9 +29,9 @@ public class XMPPOperations {
 
 	@SuppressWarnings("unchecked")
 	public void registerUserAccount(HashMap<String, String> attributes) {
-		regUser = new Registration();
+		/*regUser = new Registration();
 		regUser.setType(IQ.Type.SET);
-		regUser.setAttributes(attributes);
+		regUser.setAttributes(attributes);*/
 		new RegisterUser().execute(attributes);
 	}
 
@@ -67,7 +66,7 @@ public class XMPPOperations {
 								+ attributes.get(AppConstants.PASSWORD));
 				accountMgr.createAccount(attributes.get(AppConstants.USERNAME),
 						attributes.get(AppConstants.PASSWORD), attributes);
-				conn.sendPacket(regUser);
+				//conn.sendPacket(regUser);
 			} catch (XMPPException e) {
 				Log.e(TAG, "XMPPException: ", e);
 				ShowNotifications.notifyUser("Registration",
@@ -118,14 +117,11 @@ public class XMPPOperations {
 					conn.login(AppData.username, AppData.IMEI);
 				ChatManager chatManager = conn.getChatManager();
 				Chat newChat = chatManager.createChat(
-						"9481603262@ec2taptotransfer", new MessageListener() {
+						"123456789@ec2taptotransfer", new MessageListener() {
 							@Override
 							public void processMessage(Chat arg0,
 									org.jivesoftware.smack.packet.Message arg1) {
-								Log.i(TAG, "Message received!");
-								ShowNotifications.notifyUser("Message",
-										"Message received:" + arg1,
-										new Intent());
+								Log.i(TAG, "Message received! "+arg1);
 							}
 						});
 				newChat.sendMessage("Howdy from Prajwal!");
@@ -150,6 +146,7 @@ public class XMPPOperations {
 			Connection conn = XMPPUtil.getConnection();
 			File file = new File(attributes.get(AppConstants.FILENAME));
 			String receiver = attributes.get(AppConstants.RECEIPIENT);
+			Log.i(TAG, "File: "+attributes.get(AppConstants.FILENAME) + " and receiver: "+ receiver);
 			OutgoingFileTransfer transfer = null;
 			Intent notifyIntent = new Intent();
 			try {
@@ -204,7 +201,7 @@ public class XMPPOperations {
 					|| transfer
 							.getStatus()
 							.equals(org.jivesoftware.smackx.filetransfer.FileTransfer.Status.cancelled)) {
-				Log.e(TAG, "Refused cancelled error " + transfer.getError());
+				Log.e(TAG, "Refused cancelled error :" + transfer.getError() + transfer.getStatus());
 				ShowNotifications.notifyUser("XMPP File transfer",
 						"File transfer status: FAILED", notifyIntent);
 			} else {

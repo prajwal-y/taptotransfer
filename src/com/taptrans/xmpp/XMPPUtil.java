@@ -8,7 +8,8 @@ import com.taptrans.util.AppConstants;
 
 public class XMPPUtil {
 
-	public static Connection conn = null;
+	//private static String TAG = "XMPPUtil";
+	private static Connection conn = null;
 
 	public static Connection getConnection() {
 		if (conn == null) {
@@ -20,4 +21,5 @@ public class XMPPUtil {
 		}
 		return conn;
 	}
+
 }

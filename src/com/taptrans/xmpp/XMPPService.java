@@ -39,7 +39,6 @@ public class XMPPService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		m_XMPPConnection = XMPPUtil.getConnection();
-		manager = new FileTransferManager(m_XMPPConnection);
 		new backgroundOperation().execute();
 	}
 
@@ -98,6 +97,7 @@ public class XMPPService extends Service {
 						}
 					});
 
+			manager = new FileTransferManager(m_XMPPConnection);
 			manager.addFileTransferListener(new FileTransferListener() {
 				public void fileTransferRequest(
 						final FileTransferRequest request) {
@@ -105,10 +105,12 @@ public class XMPPService extends Service {
 						@Override
 						public void run() {
 							IncomingFileTransfer transfer = request.accept();
-							File mf = Environment.getExternalStorageDirectory();
-							File file = new File(mf.getAbsoluteFile()
-									+ transfer.getFileName());
+							Log.i(TAG, "FileName with full path: "+Environment.getExternalStorageDirectory()
+									+ "/" + transfer.getFileName());
+							File root = Environment.getExternalStorageDirectory();
+							File file = new File(root, transfer.getFileName());
 							Intent notifyIntent = new Intent();
+							Log.i(TAG, file.getAbsolutePath());
 							try {
 								transfer.recieveFile(file);
 								while (!transfer.isDone()) {
@@ -124,6 +126,7 @@ public class XMPPService extends Service {
 												"XMPP File transfer",
 												"File transfer status: FAILED",
 												notifyIntent);
+										return;
 									}
 									if (transfer
 											.getStatus()
@@ -134,6 +137,7 @@ public class XMPPService extends Service {
 												"File transfer",
 												"File transfer status: FAILED",
 												notifyIntent);
+										return;
 									}
 									if (transfer.getException() != null) {
 										Log.e(TAG,
@@ -143,6 +147,7 @@ public class XMPPService extends Service {
 												"File transfer",
 												"File transfer status: FAILED",
 												notifyIntent);
+										return;
 									}
 								}
 							} catch (Exception e) {
@@ -150,6 +155,7 @@ public class XMPPService extends Service {
 								ShowNotifications.notifyUser("File transfer",
 										"File transfer status: FAILED",
 										notifyIntent);
+								return;
 							}
 							ShowNotifications.notifyUser("File transfer",
 									"File transfer status: SUCCESSFUL!",
