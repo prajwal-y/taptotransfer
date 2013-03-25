@@ -13,6 +13,7 @@ import org.jivesoftware.smack.packet.Registration;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -29,9 +30,10 @@ public class XMPPOperations {
 
 	@SuppressWarnings("unchecked")
 	public void registerUserAccount(HashMap<String, String> attributes) {
-		/*regUser = new Registration();
-		regUser.setType(IQ.Type.SET);
-		regUser.setAttributes(attributes);*/
+		/*
+		 * regUser = new Registration(); regUser.setType(IQ.Type.SET);
+		 * regUser.setAttributes(attributes);
+		 */
 		new RegisterUser().execute(attributes);
 	}
 
@@ -42,7 +44,7 @@ public class XMPPOperations {
 	public void sendMessage() {
 		new Message().execute();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public void transferFile(HashMap<String, String> attributes) {
 		new SendFile().execute(attributes);
@@ -51,6 +53,21 @@ public class XMPPOperations {
 	private class RegisterUser extends
 			AsyncTask<HashMap<String, String>, Void, Void> {
 		// Background operation for creating device account.
+		private ProgressDialog dialog;
+
+		@Override
+		protected void onPreExecute() {
+			dialog = new ProgressDialog(AppData.activity);
+			dialog.setCancelable(true);
+			dialog.setMessage("Registering device. Hold on, you will be notified about the result!!");
+			dialog.show();
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			dialog.cancel();
+		}
+
 		@Override
 		protected Void doInBackground(HashMap<String, String>... params) {
 			try {
@@ -66,7 +83,7 @@ public class XMPPOperations {
 								+ attributes.get(AppConstants.PASSWORD));
 				accountMgr.createAccount(attributes.get(AppConstants.USERNAME),
 						attributes.get(AppConstants.PASSWORD), attributes);
-				//conn.sendPacket(regUser);
+				// conn.sendPacket(regUser);
 			} catch (XMPPException e) {
 				Log.e(TAG, "XMPPException: ", e);
 				ShowNotifications.notifyUser("Registration",
@@ -82,6 +99,22 @@ public class XMPPOperations {
 
 	private class UnRegisterUser extends AsyncTask<Void, Void, Void> {
 		// Background operation for deleting device account.
+
+		private ProgressDialog dialog;
+
+		@Override
+		protected void onPreExecute() {
+			dialog = new ProgressDialog(AppData.activity);
+			dialog.setCancelable(true);
+			dialog.setMessage("Unregistering device. Hold on, you will be notified about the result!");
+			dialog.show();
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			dialog.cancel();
+		}
+
 		@Override
 		protected Void doInBackground(Void... arg0) {
 			Connection conn = XMPPUtil.getConnection();
@@ -121,7 +154,7 @@ public class XMPPOperations {
 							@Override
 							public void processMessage(Chat arg0,
 									org.jivesoftware.smack.packet.Message arg1) {
-								Log.i(TAG, "Message received! "+arg1);
+								Log.i(TAG, "Message received! " + arg1);
 							}
 						});
 				newChat.sendMessage("Howdy from Prajwal!");
@@ -139,14 +172,16 @@ public class XMPPOperations {
 		}
 	}
 
-	private class SendFile extends AsyncTask<HashMap<String, String>, Void, Void> {
+	private class SendFile extends
+			AsyncTask<HashMap<String, String>, Void, Void> {
 		@Override
 		protected Void doInBackground(HashMap<String, String>... params) {
 			HashMap<String, String> attributes = params[0];
 			Connection conn = XMPPUtil.getConnection();
 			File file = new File(attributes.get(AppConstants.FILENAME));
 			String receiver = attributes.get(AppConstants.RECEIPIENT);
-			Log.i(TAG, "File: "+attributes.get(AppConstants.FILENAME) + " and receiver: "+ receiver);
+			Log.i(TAG, "File: " + attributes.get(AppConstants.FILENAME)
+					+ " and receiver: " + receiver);
 			OutgoingFileTransfer transfer = null;
 			Intent notifyIntent = new Intent();
 			try {
@@ -155,8 +190,8 @@ public class XMPPOperations {
 				if (!conn.isAuthenticated())
 					conn.login(AppData.username, AppData.IMEI);
 				FileTransferManager manager = new FileTransferManager(conn);
-				transfer = manager
-						.createOutgoingFileTransfer(receiver+"/Smack");
+				transfer = manager.createOutgoingFileTransfer(receiver
+						+ "/Smack");
 				transfer.sendFile(file, "test_file");
 			} catch (XMPPException e) {
 				Log.e(TAG, "XMPPException: ", e);
@@ -201,7 +236,8 @@ public class XMPPOperations {
 					|| transfer
 							.getStatus()
 							.equals(org.jivesoftware.smackx.filetransfer.FileTransfer.Status.cancelled)) {
-				Log.e(TAG, "Refused cancelled error :" + transfer.getError() + transfer.getStatus());
+				Log.e(TAG, "Refused cancelled error :" + transfer.getError()
+						+ transfer.getStatus());
 				ShowNotifications.notifyUser("XMPP File transfer",
 						"File transfer status: FAILED", notifyIntent);
 			} else {

@@ -14,6 +14,7 @@ import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 
+import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -59,6 +60,22 @@ public class XMPPService extends Service {
 	}
 
 	private class backgroundOperation extends AsyncTask<Void, Void, Void> {
+		
+		private ProgressDialog dialog;
+
+		@Override
+		protected void onPreExecute() {
+			dialog = new ProgressDialog(AppData.activity);
+			dialog.setCancelable(true);
+			dialog.setMessage("Logging on to the XMPP server. Hold on, you will be notified about the result!");
+			dialog.show();
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			dialog.cancel();
+		}
+		
 		@Override
 		protected Void doInBackground(Void... arg0) {
 			try {

@@ -12,17 +12,14 @@ import org.jivesoftware.smackx.provider.StreamInitiationProvider;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gcm.GCMRegistrar;
 import com.taptrans.filebrowser.FileBrowser;
 import com.taptrans.util.AppConstants;
 import com.taptrans.util.AppData;
@@ -60,7 +57,7 @@ public class BeginTapTrans extends Activity {
 		return true;
 	}
 
-	public void checkGCMRegistration() {
+	/*public void checkGCMRegistration() {
 		//Firstly, checking whether the registration ID is stored
 		SharedPreferences sharedPref = BeginTapTrans.this.getPreferences(Context.MODE_PRIVATE);
 		AppData.gcmRegId = sharedPref.getString(AppConstants.GCM_REG_ID, "");
@@ -75,7 +72,7 @@ public class BeginTapTrans extends Activity {
 				Log.v("INFO:", "Already registered");
 			}
 		}
-	}
+	}*/
 
 	public void getFile(View view) {
 		String extState = Environment.getExternalStorageState();
@@ -100,25 +97,26 @@ public class BeginTapTrans extends Activity {
 	}
 
 	public void deleteAccount(View view) {
-		Toast.makeText(this, "Deleting account..", Toast.LENGTH_SHORT).show();
 		new XMPPOperations().unregisterUser();
 	}
 	
 	public void logInAccount(View view) {
-		Toast.makeText(this, "Logging in..", Toast.LENGTH_SHORT).show();
 		startService(new Intent(this, XMPPService.class));
 	}
 	
 	public void logOutAccount(View view) {
-		Toast.makeText(this, "Logging out..", Toast.LENGTH_SHORT).show();
 		stopService(new Intent(this, XMPPService.class));
 	}
 	
 	public void transferData(View view) {
+		if(path == null || curFileName == null)
+			Toast.makeText(this, "Select a file to transfer", Toast.LENGTH_LONG).show();
+		else {
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put(AppConstants.FILENAME, path+"/"+curFileName);
 		map.put(AppConstants.RECEIPIENT, "123456789@ec2taptotransfer");
 		new XMPPOperations().transferFile(map);
+		}
 		//new XMPPOperations().sendMessage();
 	}
 	
