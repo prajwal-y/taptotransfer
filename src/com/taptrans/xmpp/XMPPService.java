@@ -8,9 +8,10 @@ import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.SASLAuthentication;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
+import org.jivesoftware.smackx.filetransfer.FileTransferNegotiator;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 
@@ -44,11 +45,14 @@ public class XMPPService extends Service {
 	}
 
 	private class MyMessageListener implements MessageListener {
+		
 		@Override
-		public void processMessage(final Chat chat, final Message message) {
+		public void processMessage(Chat arg0,
+				org.jivesoftware.smack.packet.Message message) {
 			Log.i(TAG, "Xmpp message received: '" + message.getBody());
 			ShowNotifications.notifyUser("Message received:",
 					message.getBody(), new Intent());
+			
 		}
 	}
 
@@ -114,7 +118,13 @@ public class XMPPService extends Service {
 						}
 					});
 
-			manager = new FileTransferManager(m_XMPPConnection);
+			ServiceDiscoveryManager sdm = ServiceDiscoveryManager.getInstanceFor(m_XMPPConnection);
+            if (sdm == null)
+                sdm = new ServiceDiscoveryManager(m_XMPPConnection);
+            sdm.addFeature("http://jabber.org/protocol/disco#info");
+            sdm.addFeature("jabber:iq:privacy");
+            manager = new FileTransferManager(m_XMPPConnection);
+            FileTransferNegotiator.setServiceEnabled(m_XMPPConnection, true);
 			manager.addFileTransferListener(new FileTransferListener() {
 				public void fileTransferRequest(
 						final FileTransferRequest request) {
@@ -133,7 +143,7 @@ public class XMPPService extends Service {
 								while (!transfer.isDone()) {
 									try {
 										Thread.sleep(1000L);
-										Log.i(TAG, "Recieving file");
+										Log.i(TAG, "Recieving file: " + (transfer.getProgress()*100) + "%");
 										// ShowNotifications.notifyUser("XMPP File transfer",
 										// "File transfer status: RECIEVING",
 										// notifyIntent);
@@ -148,8 +158,9 @@ public class XMPPService extends Service {
 									if (transfer
 											.getStatus()
 											.equals(org.jivesoftware.smackx.filetransfer.FileTransfer.Status.error)) {
-										Log.e(TAG, transfer.getError()
-												.getMessage());
+										/*Log.e(TAG, transfer.getError()
+												.getMessage());*/
+										Log.e(TAG, "Transfer failed" + transfer.getError() + transfer.getStatus());
 										ShowNotifications.notifyUser(
 												"File transfer",
 												"File transfer status: FAILED",

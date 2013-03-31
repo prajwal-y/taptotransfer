@@ -1,5 +1,7 @@
 package com.taptrans.xmpp;
 
+
+
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
@@ -12,6 +14,7 @@ public class XMPPUtil {
 	private static Connection conn = null;
 
 	public static Connection getConnection() {
+		Connection.DEBUG_ENABLED = true;
 		if (conn == null) {
 			ConnectionConfiguration config = new ConnectionConfiguration(
 					AppConstants.XMPP_DOMAIN, AppConstants.XMPP_PORT);

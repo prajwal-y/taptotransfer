@@ -190,8 +190,8 @@ public class XMPPOperations {
 				if (!conn.isAuthenticated())
 					conn.login(AppData.username, AppData.IMEI);
 				FileTransferManager manager = new FileTransferManager(conn);
-				transfer = manager.createOutgoingFileTransfer(receiver
-						+ "/Smack");
+				String to = conn.getRoster().getPresence(receiver + "/Smack").getFrom();
+				transfer = manager.createOutgoingFileTransfer(to);
 				transfer.sendFile(file, "test_file");
 			} catch (XMPPException e) {
 				Log.e(TAG, "XMPPException: ", e);
@@ -220,11 +220,13 @@ public class XMPPOperations {
 				}
 				try {
 					Thread.sleep(1000L);
-					Log.i(TAG, "Sending file");
+					Log.i(TAG, "Sending file. Progress: " + (transfer.getProgress()*100) + "%");
 					// ShowNotifications.notifyUser("XMPP File transfer",
 					// "File transfer status: SENDING", notifyIntent);
 				} catch (InterruptedException e) {
 					Log.e(TAG, "InterruptedException occurred: ", e);
+				} catch(Exception e) {
+					Log.e(TAG, "Exception occurred", e);
 				}
 			}
 			if (transfer
