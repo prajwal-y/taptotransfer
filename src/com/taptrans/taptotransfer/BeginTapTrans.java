@@ -2,11 +2,7 @@ package com.taptrans.taptotransfer;
 
 import java.util.HashMap;
 
-import org.jivesoftware.smack.provider.ProviderManager;
-import org.jivesoftware.smackx.bytestreams.socks5.provider.BytestreamsProvider;
-import org.jivesoftware.smackx.provider.DiscoverInfoProvider;
-import org.jivesoftware.smackx.provider.DiscoverItemsProvider;
-import org.jivesoftware.smackx.provider.StreamInitiationProvider;
+import org.jivesoftware.smack.SmackAndroid;
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,7 +10,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
@@ -44,20 +39,7 @@ public class BeginTapTrans extends Activity {
 		AppData.username = "9008416496";
 		//AppData.username = "123456789";
 		AppData.activity = this;
-		try{
-		ProviderManager pm = ProviderManager.getInstance();
-		pm.addIQProvider("si", "http://jabber.org/protocol/si", new StreamInitiationProvider());
-		pm.addIQProvider("query", "http://jabber.org/protocol/bytestreams", new BytestreamsProvider());
-		pm.addIQProvider("query","http://jabber.org/protocol/disco#items", new DiscoverItemsProvider());
-		pm.addIQProvider("query","http://jabber.org/protocol/disco#info", new DiscoverInfoProvider());
-		}catch(Exception e){
-			Log.e(TAG, "Exception occurred: ", e);
-		}
-		/*pm.addExtensionProvider("data", "http://jabber.org/protocol/ibb", new DataPacketProvider());
-	    pm.addIQProvider("open", "http://jabber.org/protocol/ibb", new OpenIQProvider());
-	    pm.addIQProvider("data", "http://jabber.org/protocol/ibb", new DataPacketProvider());
-	    pm.addIQProvider("close", "http://jabber.org/protocol/ibb", new CloseIQProvider());*/
-
+		SmackAndroid.init(this);
 	}
 
 	@Override
@@ -123,8 +105,8 @@ public class BeginTapTrans extends Activity {
 		else {
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put(AppConstants.FILENAME, path+"/"+curFileName);
-		map.put(AppConstants.RECEIPIENT, "9481603262@ec2taptotransfer");
-		//map.put(AppConstants.RECEIPIENT, "123456789@ec2taptotransfer");
+		//map.put(AppConstants.RECEIPIENT, "9481603262@ec2taptotransfer");
+		map.put(AppConstants.RECEIPIENT, "123456789@ec2taptotransfer");
 		//map.put(AppConstants.RECEIPIENT, "9008416496@ec2taptotransfer");
 		new XMPPOperations().transferFile(map);
 		}

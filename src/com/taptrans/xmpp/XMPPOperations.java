@@ -6,8 +6,8 @@ import java.util.HashMap;
 import org.jivesoftware.smack.AccountManager;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
-import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.MessageListener;
+import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Registration;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
@@ -71,7 +71,7 @@ public class XMPPOperations {
 		@Override
 		protected Void doInBackground(HashMap<String, String>... params) {
 			try {
-				Connection conn = XMPPUtil.getConnection();
+				XMPPConnection conn = XMPPUtil.getConnection();
 				if (!conn.isConnected())
 					conn.connect();
 				accountMgr = new AccountManager(conn);
@@ -117,7 +117,7 @@ public class XMPPOperations {
 
 		@Override
 		protected Void doInBackground(Void... arg0) {
-			Connection conn = XMPPUtil.getConnection();
+			XMPPConnection conn = XMPPUtil.getConnection();
 			try {
 				if (!conn.isConnected())
 					conn.connect();
@@ -142,7 +142,7 @@ public class XMPPOperations {
 		// Send message to device
 		@Override
 		protected Void doInBackground(Void... arg0) {
-			Connection conn = XMPPUtil.getConnection();
+			XMPPConnection conn = XMPPUtil.getConnection();
 			try {
 				if (!conn.isConnected())
 					conn.connect();
@@ -177,7 +177,7 @@ public class XMPPOperations {
 		@Override
 		protected Void doInBackground(HashMap<String, String>... params) {
 			HashMap<String, String> attributes = params[0];
-			Connection conn = XMPPUtil.getConnection();
+			XMPPConnection conn = XMPPUtil.getConnection();
 			File file = new File(attributes.get(AppConstants.FILENAME));
 			String receiver = attributes.get(AppConstants.RECEIPIENT);
 			Log.i(TAG, "File: " + attributes.get(AppConstants.FILENAME)
@@ -208,6 +208,7 @@ public class XMPPOperations {
 					Log.e(TAG, "ERROR" + transfer.getError());
 					ShowNotifications.notifyUser("XMPP File transfer",
 							"File transfer status: FAILED", notifyIntent);
+					break;
 				} else if (transfer
 						.getStatus()
 						.equals(org.jivesoftware.smackx.filetransfer.FileTransfer.Status.cancelled)
@@ -217,6 +218,7 @@ public class XMPPOperations {
 					Log.e(TAG, "Cancelled!!! " + transfer.getError());
 					ShowNotifications.notifyUser("XMPP File transfer",
 							"File transfer status: CANCELLED", notifyIntent);
+					break;
 				}
 				try {
 					Thread.sleep(1000L);
@@ -225,8 +227,10 @@ public class XMPPOperations {
 					// "File transfer status: SENDING", notifyIntent);
 				} catch (InterruptedException e) {
 					Log.e(TAG, "InterruptedException occurred: ", e);
+					break;
 				} catch(Exception e) {
 					Log.e(TAG, "Exception occurred", e);
+					break;
 				}
 			}
 			if (transfer

@@ -4,9 +4,9 @@ import java.io.File;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManagerListener;
-import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.SASLAuthentication;
+import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
@@ -25,10 +25,11 @@ import android.util.Log;
 
 import com.taptrans.util.AppData;
 import com.taptrans.util.ShowNotifications;
+import com.taptrans.util.Util;
 
 public class XMPPService extends Service {
 
-	private static Connection m_XMPPConnection = null;
+	private static XMPPConnection m_XMPPConnection = null;
 	private static String TAG = "XMPPService";
 	private static FileTransferManager manager = null;
 
@@ -41,6 +42,7 @@ public class XMPPService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		m_XMPPConnection = XMPPUtil.getConnection();
+		XMPPUtil.addProxyAddress(Util.getDeviceIpAddress(), true);
 		new backgroundOperation().execute();
 	}
 
@@ -131,12 +133,15 @@ public class XMPPService extends Service {
 					new Thread() {
 						@Override
 						public void run() {
+							Intent notifyIntent = new Intent();
+							ShowNotifications.notifyUser("File transfer",
+									"Receiving file from: "+request.getRequestor(),
+									notifyIntent);
 							IncomingFileTransfer transfer = request.accept();
 							Log.i(TAG, "FileName with full path: "+Environment.getExternalStorageDirectory()
 									+ "/" + transfer.getFileName());
 							File root = Environment.getExternalStorageDirectory();
 							File file = new File(root, transfer.getFileName());
-							Intent notifyIntent = new Intent();
 							Log.i(TAG, file.getAbsolutePath());
 							try {
 								transfer.recieveFile(file);

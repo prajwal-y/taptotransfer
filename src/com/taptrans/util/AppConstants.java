@@ -11,7 +11,7 @@ public class AppConstants {
 	public static final String GCM_REG_ID = "gcmRegId";
 	public static final String SENDER_ID = "837004328613";
 	public static final String XMPP_TAG = "XMPPService";
-	public static final String XMPP_DOMAIN = "107.20.254.21";
+	public static final String XMPP_DOMAIN = "54.234.172.226";
 	public static final int XMPP_PORT = 5222;
 	public static final String USERNAME = "username";
 	public static final String PASSWORD = "password";
